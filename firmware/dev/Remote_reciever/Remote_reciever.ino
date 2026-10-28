@@ -21,7 +21,8 @@ void setup()
     // Setup Serial Monitor
     Serial.begin(9600);
 }
- 
+
+
 void loop()
 {
     // Set buffer to size of expected message
@@ -36,6 +37,8 @@ void loop()
 //    Serial.println((char*)buf);
 //        x=(char*)buf;
 //        Serial.println(x);
+
+
     if(buf[0]=='0'){
       turnstep= buf[1] - '0';
     }
@@ -47,7 +50,7 @@ void loop()
 
     if(buf[2]-'0'==9){
       turnspeed=4000;
-      turnAmount=4000*2;//180deg    
+      turnAmount=4000;//90deg    
     }
     else if(buf[2]- '0'==8){
       turnspeed=3000;
@@ -59,11 +62,11 @@ void loop()
     }
     else if(buf[2]- '0'==6){
       turnspeed=2000;
-      turnAmount=80*1;//1.8deg 
+      turnAmount=80*2;//3.8deg 
     }
     else if(buf[2]- '0'==5){
       turnspeed=2000;
-      turnAmount=20*1;//0.45deg 
+      turnAmount=20*2;//0.9deg 
     }
     else if(buf[2]- '0'==4){
       turnspeed=2000;
@@ -71,37 +74,38 @@ void loop()
     }
     else if(buf[2]- '0'==3){
       turnspeed=2000;
-      turnAmount=20*1;//0.45deg 
+      turnAmount=10*1;//0.225deg 
     }
     else if(buf[2]- '0'==2){
       turnspeed=2000;
-      turnAmount=20*1;//0.45deg 
+      turnAmount=5*1;//0.1125deg 
     }
     else if(buf[2]- '0'==1){
-      turnspeed=2000;
-      turnAmount=20*1;//0.45deg 
+      turnspeed=360;
+      turnAmount=turnstep*2;//2stepp
     }
     else if(buf[2]- '0'==0){
       turnspeed=360;
-      turnAmount=turnstep;
+      turnAmount=turnstep;//SingleStep
     }
     turndir=buf[3]- '0';
 //    Serial.println(turndir);
-    if(turndir!=9){
+    
+    actuate(); 
+    }
+void actuate(){
+  if(turndir!=9){
       if(turndir==1){
         targetposition=targetposition+turnAmount;
         runmotor();
-        delay(200);
+        delay(100);
         }
       else if(turndir==0){
         targetposition=targetposition-turnAmount;
         runmotor();
-        delay(200);
+        delay(100);
         }
-    
-      
-      
-    }
+  }
 }
 void runmotor(){
     stepper.setMaxSpeed(turnspeed);
@@ -109,6 +113,4 @@ void runmotor(){
     stepper.runToNewPosition(targetposition);
     Serial.println(targetposition);
     Serial.println(turnspeed);
-    
-  
   }

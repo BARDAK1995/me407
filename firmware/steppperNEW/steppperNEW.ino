@@ -4,16 +4,16 @@
 
 
 
-int inputpin_Pitch_Dir=9;
-int inputpin_Pitch_Step=8;
-int Output_Pitch_Step=4;
-int Output_Pitch_Dir=5;
+int inputpin_Pitch_Dir=3;
+int inputpin_Pitch_Step=2;
+int Output_Pitch_Step=19;
+int Output_Pitch_Dir=18;
 
-int inputpin_Roll_Step=10;
-int inputpin_Roll_Dir=11;
+int inputpin_Roll_Step=6;
+int inputpin_Roll_Dir=7;
 
-int Output_Roll_Step=6;
-int Output_Roll_Dir=7;
+int Output_Roll_Step=12;
+int Output_Roll_Dir=11;
 
 
 AccelStepper stepperPitch(1, Output_Pitch_Step,Output_Pitch_Dir);
@@ -46,44 +46,16 @@ int directionROLL=0;
 
 
 
-//void readButtons(){
-//    if((millis()-lastPress)>debounceTime && buttonFlag1){
-//        lastPress=millis();
-//        toggleState1=digitalRead(buttonPin1);
-//        toggleState1=toggleState1*1;   
-//        buttonFlag1=0;
-//        //sendSerial();  
-//    }
-//    if((millis()-lastPress)>debounceTime && buttonFlag2){
-//      lastPress=millis();
-//      toggleState2=digitalRead(buttonPin2);
-//      toggleState2=toggleState2*1;
-//      buttonFlag2=0;
-//      //sendSerial();
-//    }
-//    directionBoth = digitalRead(buttonPin3);   
-//}
-
-
-//void ISR_Button1(){
-//  buttonFlag1=1;
-//}
-//
-//void ISR_Button2(){
-//  buttonFlag2=1;  
-//}
-
-
 void setup() {
   Serial.begin(9600);
   stepperPitch.setMaxSpeed(1000.0);
-  stepperPitch.setSpeed(840);
+  stepperPitch.setSpeed(800);
 //  stepperPitch.setAcceleration(500.0);
   stepperPitch.setMinPulseWidth(20); 
   stepperPitch.enableOutputs();
 
   stepperRoll.setMaxSpeed(1000.0);
-  stepperRoll.setSpeed(860);
+  stepperRoll.setSpeed(820);
 //  stepperRoll.setAcceleration(500.0);
   stepperRoll.setMinPulseWidth(20); 
   stepperRoll.enableOutputs();

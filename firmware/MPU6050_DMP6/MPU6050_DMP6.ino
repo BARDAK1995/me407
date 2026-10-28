@@ -99,17 +99,17 @@ MPU6050 mpu;
 //#define OUTPUT_TEAPOT
 
 
-#define MPU6050_INT_PIN 3
-#define MPU6050_INT digitalPinToInterrupt(MPU6050_INT_PIN)
+//#define MPU6050_INT_PIN 3
+//#define MPU6050_INT digitalPinToInterrupt(MPU6050_INT_PIN)
 
 bool blinkState = false;
-int Pitch_RapidPin=11;
-int Roll_RapidPin=12;
-int Pitch_CheckPin=10;
-int Roll_CheckPin=13;
-int Pitch_DirPin=5;
-int Roll_DirPin=6;
-int levelingDonePin=4;
+int Pitch_RapidPin=12;
+int Roll_RapidPin=11;
+int Pitch_CheckPin=16;
+int Roll_CheckPin=2;
+int Pitch_DirPin=17;
+int Roll_DirPin=4;
+int levelingDonePin=10;
 float pitch=0;
 float roll=0;
 
@@ -168,7 +168,7 @@ void dmpDataReady() {
 // ================================================================
 
 void setup() {
-    pinMode(MPU6050_INT, INPUT);
+    pinMode(2, INPUT);
     pinMode(Pitch_CheckPin,OUTPUT);
     pinMode(Pitch_DirPin,OUTPUT); 
     pinMode(Pitch_RapidPin,OUTPUT);
@@ -206,6 +206,7 @@ void setup() {
     Serial.println(F("Initializing I2C devices..."));
     
     mpu.initialize();
+    delay(20);
     mpu.setDLPFMode(6); 
     // verify connection
     Serial.println(F("Testing device connections..."));
@@ -216,12 +217,12 @@ void setup() {
     devStatus = mpu.dmpInitialize();
 
     // supply your own gyro offsets here, scaled for min sensitivity
-    mpu.setXGyroOffset(58);
-    mpu.setYGyroOffset(-16);
-    mpu.setZGyroOffset(-17);
-    mpu.setXAccelOffset(-1337);
-    mpu.setYAccelOffset(1888);
-    mpu.setZAccelOffset(1272); // 1688 factory default for my test chip
+    mpu.setXGyroOffset(120);
+    mpu.setYGyroOffset(10);
+    mpu.setZGyroOffset(-60);
+    mpu.setXAccelOffset(-791);
+    mpu.setYAccelOffset(795);
+    mpu.setZAccelOffset(1384); // 1688 factory default for my test chip
 
     // make sure it worked (returns 0 if so)
     if (devStatus == 0) {
@@ -231,7 +232,7 @@ void setup() {
 
         // enable Arduino interrupt detection
         Serial.println(F("Enabling interrupt detection (Arduino external interrupt 7)..."));
-        attachInterrupt(MPU6050_INT, dmpDataReady, RISING);
+        attachInterrupt(1, dmpDataReady, RISING);
         mpuIntStatus = mpu.getIntStatus();
 
         // set our DMP Ready flag so the main loop() function knows it's okay to use it
@@ -264,61 +265,59 @@ void loop() {
   currentMillis=millis();
   
     
-    if (currentMillis - initialMilllis >= 10000) {
+    if (currentMillis - initialMilllis >= 15000) {
       millischeck=true;
       }
     else{
       Serial.println("JUST WAIT");
-      pitchTamsayi=11;
-      pitchKusurat=22;
-      rollTamsayi=33;
-      rollKusurat=44;
       
     }
 
-    if(currentMillis-previousMillis>250){
-      previousMillis=currentMillis;
-      Wire.beginTransmission(5);
-      Wire.write(pitchTamsayi);//tamsayi
-      Wire.write(pitchKusurat);//kusurat
-      Wire.write(rollTamsayi);
-      Wire.write(rollKusurat);
-      
-//      if(i2cCounter%4==0) Wire.write(pitchTamsayi);//tamsayi
-//      else if(i2cCounter%4==1) Wire.write(pitchKusurat);//kusurat
-//      else if(i2cCounter%4==2) Wire.write(rollTamsayi);
-//      else if(i2cCounter%4==3){
-//        Wire.write(rollKusurat);
-//        i2cCounter=-1;
-//      }
-    Wire.endTransmission();
-    i2cCounter++;
-    }
+//    if(currentMillis-previousMillis>250){
+//      previousMillis=currentMillis;
+//      Wire.beginTransmission(5);
+//      Wire.write(pitchTamsayi);//tamsayi
+//      Wire.write(pitchKusurat);//kusurat
+//      Wire.write(rollTamsayi);
+//      Wire.write(rollKusurat);
+//      
+////      if(i2cCounter%4==0) Wire.write(pitchTamsayi);//tamsayi
+////      else if(i2cCounter%4==1) Wire.write(pitchKusurat);//kusurat
+////      else if(i2cCounter%4==2) Wire.write(rollTamsayi);
+////      else if(i2cCounter%4==3){
+////        Wire.write(rollKusurat);
+////        i2cCounter=-1;
+////      }
+//    Wire.endTransmission();
+//    i2cCounter++;
+//    }
     
     // if programming failed, don't try to do anything
     if (!dmpReady){
+      Serial.println("not ready");
       return;
       } 
-
+    
     // wait for MPU interrupt or extra packet(s) available
     while (!mpuInterrupt && fifoCount < packetSize) {
-      if (abs(pitch)>0.35){
+      
+      if (abs(pitch)>0.25){
         digitalWrite(Pitch_RapidPin,LOW);
         }
       else{
         digitalWrite(Pitch_RapidPin,HIGH);
         }
-      if (abs(roll)>0.4){
+      if (abs(roll)>0.25){
         digitalWrite(Roll_RapidPin,LOW);
         }
       else{
         digitalWrite(Roll_RapidPin,HIGH);
         }
-      if(pitch>0.04){
+      if(pitch>0.03){
         digitalWrite(Pitch_CheckPin,HIGH);
         digitalWrite(Pitch_DirPin,HIGH);
         }
-       else if(pitch<-0.04){
+       else if(pitch<-0.03){
         digitalWrite(Pitch_CheckPin,HIGH);
         digitalWrite(Pitch_DirPin,LOW);
         }
@@ -326,11 +325,11 @@ void loop() {
         digitalWrite(Pitch_CheckPin,LOW);
         digitalWrite(Pitch_DirPin,LOW);
         }
-       if(roll>0.04){
+       if(roll>0.03){
         digitalWrite(Roll_CheckPin,HIGH);
         digitalWrite(Roll_DirPin,HIGH);
         }
-       else if(roll<-0.04){
+       else if(roll<-0.03){
         digitalWrite(Roll_CheckPin,HIGH);
         digitalWrite(Roll_DirPin,LOW);
         }
@@ -339,7 +338,7 @@ void loop() {
         digitalWrite(Roll_DirPin,LOW);
       }
 
-      if(abs(roll)<0.04&abs(pitch)<0.04){
+      if(abs(roll)<0.03&abs(pitch)<0.03){
         digitalWrite(levelingDonePin,HIGH);
         }
       else if(!millischeck){
@@ -349,7 +348,6 @@ void loop() {
         digitalWrite(levelingDonePin,LOW);
         }
     }
-
     // reset interrupt flag and get INT_STATUS byte
     mpuInterrupt = false;
     mpuIntStatus = mpu.getIntStatus();
@@ -365,6 +363,7 @@ void loop() {
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
     } else if (mpuIntStatus & 0x02) {
+        
         // wait for correct available data length, should be a VERY short wait
         while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
 
@@ -385,19 +384,19 @@ void loop() {
             pitch=ypr[1] * 180/M_PI;
             roll=ypr[2] * 180/M_PI;
           
-            firstNumberFirst2digits=floor(abs(pitch));
-            firstNumberNEXT2digits=(abs(pitch)-firstNumberFirst2digits)*100;
-            
-            secondNumberFirst2digits=floor(abs(roll));
-            secondNumberNEXT2digits=(abs(roll)-secondNumberFirst2digits)*100;
+//            firstNumberFirst2digits=floor(abs(pitch));
+//            firstNumberNEXT2digits=(abs(pitch)-firstNumberFirst2digits)*100;
+//            
+//            secondNumberFirst2digits=floor(abs(roll));
+//            secondNumberNEXT2digits=(abs(roll)-secondNumberFirst2digits)*100;
 
 //            Serial.print(firstNumberFirst2digits);
 //            Serial.println(firstNumberNEXT2digits);
 //            Serial.println("done");
-            pitchTamsayi=firstNumberFirst2digits;
-            pitchKusurat=firstNumberNEXT2digits;
-            rollTamsayi=secondNumberFirst2digits;
-            rollKusurat=secondNumberNEXT2digits;
+//            pitchTamsayi=firstNumberFirst2digits;
+//            pitchKusurat=firstNumberNEXT2digits;
+//            rollTamsayi=secondNumberFirst2digits;
+//            rollKusurat=secondNumberNEXT2digits;
             
             
             Serial.print("ypr\t");

@@ -20,8 +20,8 @@ MPU6050 mpu;
 
 
 //#define OUTPUT_TEAPOT
-#define MAX7219_DIN           11
-#define MAX7219_CS            10
+#define MAX7219_DIN           10
+#define MAX7219_CS            11
 #define MAX7219_CLK           13
 
 // enumerate the MAX7219 registers
@@ -67,7 +67,7 @@ byte rollTamsayi = 0;
 byte rollKusurat = 0;
 
 String str = "12345678";
-
+String str2 = "12345678";
 int i2cCounter = 0;
 
 unsigned long currentMillis = 0;
@@ -147,6 +147,7 @@ void setup() {
   Serial.println(F("Initializing I2C devices..."));
   //
   mpu.initialize();
+  delay(20);
   mpu.setDLPFMode(6);
   //    // verify connection
   Serial.println(F("Testing device connections..."));
@@ -157,12 +158,12 @@ void setup() {
   devStatus = mpu.dmpInitialize();
   //
   //    // supply your own gyro offsets here, scaled for min sensitivity
-  mpu.setXGyroOffset(43);
-  mpu.setYGyroOffset(-110);
-  mpu.setZGyroOffset(33);
-  mpu.setXAccelOffset(1089); 
-  mpu.setYAccelOffset(-1775); 
-  mpu.setZAccelOffset(1561); // 1688 factory default for my test chip
+   mpu.setXGyroOffset(180);
+    mpu.setYGyroOffset(-50);
+    mpu.setZGyroOffset(-40);
+    mpu.setXAccelOffset(-4163);
+    mpu.setYAccelOffset(769);
+    mpu.setZAccelOffset(1425);
   //
   //    // make sure it worked (returns 0 if so)
   if (devStatus == 0) {
@@ -253,10 +254,10 @@ void loop() {
     }
 
     if (firstNumberNEXT2digits < 10) {
-      firstNumberNEXT2digitsSTR = "0" + String(firstNumberNEXT2digits);
+      firstNumberNEXT2digitsSTR = "0"+String(firstNumberNEXT2digits/10)+"0";
     }
     else {
-      firstNumberNEXT2digitsSTR = String(firstNumberNEXT2digits);
+      firstNumberNEXT2digitsSTR = String(firstNumberNEXT2digits/10)+"0";
     }
 
     secondNumberFirst2digits = floor(abs(roll));
@@ -270,35 +271,38 @@ void loop() {
     }
 
     if (secondNumberNEXT2digits < 10) {
-      secondNumberNEXT2digitsSTR = "0" + String(secondNumberNEXT2digits);
+      secondNumberNEXT2digitsSTR = String(secondNumberNEXT2digits/10)+"0";
     }
     else {
-      secondNumberNEXT2digitsSTR = String(secondNumberNEXT2digits);
+      secondNumberNEXT2digitsSTR = String(secondNumberNEXT2digits/10)+"0";
     }
 
 
 
 
 
-    //            Serial.println(firstNumberFirst2digits);
-    //            Serial.println(firstNumberNEXT2digits);
+//                Serial.println(firstNumberFirst2digitsSTR);
+//                Serial.println(firstNumberNEXT2digitsSTR);
+//                Serial.println(secondNumberFirst2digitsSTR);
+//                Serial.println(secondNumberNEXT2digitsSTR);
+                
     //            Serial.println("done");
 
-
-    //            pitchTamsayi=firstNumberFirst2digits;
-    //            pitchKusurat=firstNumberNEXT2digits;
-    //            rollTamsayi=secondNumberFirst2digits;
-    //            rollKusurat=secondNumberNEXT2digits;
+//
+//                pitchTamsayi=firstNumberFirst2digits;
+//                pitchKusurat=firstNumberNEXT2digits;
+//                rollTamsayi=secondNumberFirst2digits;
+//                rollKusurat=secondNumberNEXT2digits;
 
     str = firstNumberFirst2digitsSTR + firstNumberNEXT2digitsSTR + secondNumberFirst2digitsSTR + secondNumberNEXT2digitsSTR;
-
-    //            Serial.print("ypr\t");
-    //            Serial.print(ypr[0] * 180/M_PI);
-    //            Serial.print("\t");
-    //            Serial.print(ypr[1] * 180/M_PI);
-    //            Serial.print("\t");
-    //            Serial.println(ypr[2] * 180/M_PI);
-    //        #endif
+//    Serial.println(str);
+//                Serial.print("ypr\t");
+//                Serial.print(ypr[0] * 180/M_PI);
+//                Serial.print("\t");
+//                Serial.print(ypr[1] * 180/M_PI);
+//                Serial.print("\t");
+//                Serial.println(ypr[2] * 180/M_PI);
+//            #endif
   }
 }
 

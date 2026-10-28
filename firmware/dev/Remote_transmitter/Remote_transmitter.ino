@@ -16,7 +16,7 @@ int turnspeed=1;
 int turnstep=16;
 int turndirection=0;
 int delaytime=150;
-
+int isSelect=0;
 void setup()
 {
     // Initialize ASK Object
@@ -25,16 +25,12 @@ void setup()
     rf_driver.init();
     Serial.begin(9600);
 }
- 
-void loop()
-{
-    xValue = analogRead(joyX);
-    
+void readJoyStick(){
+  xValue = analogRead(joyX);
     if(xValue>800){
       if(turnspeed>0&&turnspeed<9){
       turnspeed++;
       delay(delaytime);
-
       }
       else if(turnspeed==0){
         if(turnstep==16){
@@ -43,7 +39,6 @@ void loop()
         else{
           turnstep=turnstep*2;
           delay(delaytime);
-
           }
         }
     }
@@ -51,36 +46,42 @@ void loop()
       if(turnspeed>0){
         turnspeed--;
         delay(delaytime);
-
         }
       else if(turnspeed==0&turnstep>1){
         turnstep=turnstep/2;
         delay(delaytime);
-
         }
     }
     yValue = analogRead(joyY);
-    
     if(yValue>950){
       turndirection=1;
       delay(delaytime);
-
     }
     else if(yValue<150){
       turndirection=0;
       delay(delaytime);
- 
     }
     else{
       turndirection=9;
       }
-    int isSelect=digitalRead(SW_pin);
+    isSelect=digitalRead(SW_pin);
+  }
+
+void transmitMessage(){
+  char tmp[6];
+    msgString.toCharArray(tmp, sizeof(tmp));
+//    send(tmp);
+
+     Serial.println(tmp);
+    rf_driver.send((uint8_t *)tmp, strlen(tmp));
+    rf_driver.waitPacketSent();
+  
+  
+  }
+void loop()
+{
+    readJoyStick();
     
-     
-//    const char *msg = "Hello World";
-//    Serial.print(xValue);
-//    Serial.print("\t");
-//    Serial.pintln(yValue);
     if(turnstep<10){
       msgString="0"+String(turnstep)+String(turnspeed)+String(turndirection)+String(isSelect);
       }
@@ -91,12 +92,8 @@ void loop()
 //    Serial.print(turnspeed);
 //    Serial.print(turndirection);
 //    Serial.println(isSelect);
-    char tmp[6];
-    msgString.toCharArray(tmp, sizeof(tmp));
-//    send(tmp);
-
-     Serial.println(tmp);
-    rf_driver.send((uint8_t *)tmp, strlen(tmp));
-    rf_driver.waitPacketSent();
+    
+    transmitMessage();
+    
     delay(50);
 }
